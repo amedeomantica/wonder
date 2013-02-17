@@ -1,0 +1,102 @@
+{
+    attributes = (
+        {columnName = altitudine; name = altitudine; prototypeName = intNumber; }, 
+        {columnName = codiceComune; name = codiceComune; prototypeName = intNumber; }, 
+        {
+            allowsNull = N; 
+            columnName = codiceIstatComune; 
+            name = codiceIstatComune; 
+            prototypeName = id; 
+        }, 
+        {
+            columnName = codiceIstatComune103; 
+            name = codiceIstatComune103; 
+            prototypeName = intNumber; 
+        }, 
+        {
+            columnName = codiceIstatComune107; 
+            name = codiceIstatComune107; 
+            prototypeName = intNumber; 
+        }, 
+        {
+            allowsNull = N; 
+            columnName = codiceProvincia; 
+            name = codiceProvincia; 
+            prototypeName = intNumber; 
+        }, 
+        {columnName = codiceRegione; name = codiceRegione; prototypeName = intNumber; }, 
+        {
+            allowsNull = N; 
+            columnName = denominazione; 
+            name = denominazione; 
+            prototypeName = varchar255; 
+        }, 
+        {
+            allowsNull = Y; 
+            columnName = denominazioneItaliano; 
+            name = denominazioneItaliano; 
+            prototypeName = varchar255; 
+        }, 
+        {
+            allowsNull = Y; 
+            columnName = denominazioneTedesco; 
+            name = denominazioneTedesco; 
+            prototypeName = varchar255; 
+        }, 
+        {columnName = isCapoluogo; name = isCapoluogo; prototypeName = intBoolean; }, 
+        {columnName = isLitoraneo; name = isLitoraneo; prototypeName = intBoolean; }, 
+        {
+            allowsNull = N; 
+            columnName = isMontano; 
+            name = isMontano; 
+            prototypeName = varchar10; 
+        }, 
+        {columnName = popolazione; name = popolazione; prototypeName = intNumber; }, 
+        {
+            columnName = superficieTerritorialeTotale; 
+            name = superficieTerritorialeTotale; 
+            prototypeName = doubleNumber; 
+        }, 
+        {
+            columnName = zonaAltimetrica; 
+            name = zonaAltimetrica; 
+            prototypeName = intNumber; 
+        }
+    ); 
+    attributesUsedForLocking = (codiceIstatComune); 
+    className = "er.geo.ItalianCity"; 
+    classProperties = (
+        altitudine, 
+        codiceComune, 
+        codiceIstatComune103, 
+        codiceIstatComune107, 
+        codiceProvincia, 
+        codiceRegione, 
+        denominazione, 
+        denominazioneItaliano, 
+        denominazioneTedesco, 
+        isCapoluogo, 
+        isLitoraneo, 
+        isMontano, 
+        popolazione, 
+        province, 
+        superficieTerritorialeTotale, 
+        zonaAltimetrica
+    ); 
+    externalName = "ITALIAN_CITY"; 
+    fetchSpecificationDictionary = {}; 
+    isReadOnly = Y; 
+    name = ItalianCity; 
+    primaryKeyAttributes = (codiceIstatComune); 
+    relationships = (
+        {
+            destination = ItalianProvince; 
+            isMandatory = Y; 
+            isToMany = N; 
+            joinSemantic = EOInnerJoin; 
+            joins = ({destinationAttribute = codiceProvincia; sourceAttribute = codiceProvincia; }); 
+            name = province; 
+        }
+    ); 
+    userInfo = {"_EntityModeler" = {documentation = ""; }; }; 
+}

@@ -1,0 +1,56 @@
+{
+    attributes = (
+        {
+            allowsNull = N; 
+            columnName = codiceProvincia; 
+            name = codiceProvincia; 
+            prototypeName = id; 
+        }, 
+        {columnName = codiceRegione; name = codiceRegione; prototypeName = intNumber; }, 
+        {
+            columnName = codiceRipartizione; 
+            name = codiceRipartizione; 
+            prototypeName = intNumber; 
+        }, 
+        {
+            columnName = denominazione; 
+            name = denominazione; 
+            prototypeName = varchar100; 
+        }, 
+        {
+            columnName = denominazioneRegione; 
+            name = denominazioneRegione; 
+            prototypeName = varchar100; 
+        }, 
+        {
+            columnName = ripartizioneGeografica; 
+            name = ripartizioneGeografica; 
+            prototypeName = varchar100; 
+        }, 
+        {columnName = sigla; name = sigla; prototypeName = varchar10; }
+    ); 
+    attributesUsedForLocking = (codiceProvincia); 
+    className = "er.geo.ItalianProvince"; 
+    classProperties = (
+        cities, 
+        codiceRegione, 
+        codiceRipartizione, 
+        denominazione, 
+        denominazioneRegione, 
+        ripartizioneGeografica, 
+        sigla
+    ); 
+    externalName = "ITALIAN_PROVINCE"; 
+    fetchSpecificationDictionary = {}; 
+    name = ItalianProvince; 
+    primaryKeyAttributes = (codiceProvincia); 
+    relationships = (
+        {
+            destination = ItalianCity; 
+            isToMany = Y; 
+            joinSemantic = EOInnerJoin; 
+            joins = ({destinationAttribute = codiceProvincia; sourceAttribute = codiceProvincia; }); 
+            name = cities; 
+        }
+    ); 
+}
