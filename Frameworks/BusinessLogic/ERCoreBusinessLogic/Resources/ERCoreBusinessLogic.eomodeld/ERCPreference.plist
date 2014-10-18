@@ -4,10 +4,11 @@
         {columnName = "KEY_"; name = key; prototypeName = varchar100; }, 
         {allowsNull = Y; columnName = "USER_ID"; name = userID; prototypeName = id; }, 
         {
-            allowsNull = Y; 
             columnName = "VALUE_"; 
+            externalType = CLOB; 
             name = value; 
-            prototypeName = varcharLarge; 
+            valueClassName = NSString; 
+            valueType = c; 
         }
     ); 
     attributesUsedForLocking = (id, key, userID); 

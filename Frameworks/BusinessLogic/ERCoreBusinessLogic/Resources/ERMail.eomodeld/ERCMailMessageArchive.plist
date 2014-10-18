@@ -25,6 +25,7 @@
             prototypeName = dateTime; 
         }, 
         {
+            allowsNull = Y; 
             columnName = "EXCEPTION_REASON"; 
             name = exceptionReason; 
             prototypeName = varchar1000; 
@@ -59,11 +60,18 @@
         {
             adaptorValueConversionMethodName = value; 
             columnName = "MAIL_STATE_ID"; 
+            factoryMethodArgumentType = EOFactoryMethodArgumentIsNSString; 
             name = state; 
             prototypeName = osType; 
+            valueClassName = "er.corebusinesslogic.ERCMailState"; 
             valueFactoryMethodName = mailState; 
         }, 
-        {columnName = "TEXT_"; name = text; prototypeName = varcharLarge; }, 
+        {
+            allowsNull = Y; 
+            columnName = "TEXT_"; 
+            name = text; 
+            prototypeName = varcharLarge; 
+        }, 
         {
             allowsNull = Y; 
             columnName = "TEXT_COMPRESSED"; 
