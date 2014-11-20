@@ -1,8 +1,3 @@
-ResetStyleSheet : ERXStyleSheet {
-	filename = "reset_base_fonts.css";
-	framework = "ERModernDirectToWeb";
-}
-
 StyleSheetRepetition : WORepetition {
 	list = d2wContext.stylesheets;
 	item = stylesheetName;
