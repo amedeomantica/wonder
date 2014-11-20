@@ -50,7 +50,7 @@ public  class ERDActionButton extends ERDCustomComponent {
 
     /** Action buttons must be stateless. */
     @Override
-    public final boolean isStateless() { return true; }
+    public boolean isStateless() { return true; }
 
     /** Action buttons do not synchronize their variables. */
     @Override
