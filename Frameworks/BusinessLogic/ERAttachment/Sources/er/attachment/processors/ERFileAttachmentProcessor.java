@@ -147,7 +147,15 @@ public class ERFileAttachmentProcessor extends ERAttachmentProcessor<ERFileAttac
   
   @Override
   public void deleteAttachment(ERFileAttachment attachment) throws IOException {
-    String filesystemPath = attachment.filesystemPath();
+	String filesystemPathPrefix = ERXProperties.stringForKey("er.attachment.file.filesystemPathPrefix");
+	String filePath = attachment.filesystemPath();
+	String filesystemPath = filePath;
+	if(filesystemPathPrefix!=null) {
+		// we are not going to add the prefix if it is already in the path
+		if(!filePath.startsWith(filesystemPathPrefix)) {
+			filesystemPath = filesystemPathPrefix + filePath;
+		}
+	}
     File attachmentFile = new File(filesystemPath);
     if (attachmentFile.exists() && !attachmentFile.delete()) {
       throw new IOException("Failed to delete the attachment '" + attachmentFile + "'.");
