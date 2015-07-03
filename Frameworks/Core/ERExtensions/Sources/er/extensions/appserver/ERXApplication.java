@@ -112,6 +112,7 @@ import er.extensions.foundation.ERXProperties;
 import er.extensions.foundation.ERXRuntimeUtilities;
 import er.extensions.foundation.ERXThreadStorage;
 import er.extensions.foundation.ERXTimestampUtilities;
+import er.extensions.foundation.ERXValueUtilities;
 import er.extensions.localization.ERXLocalizer;
 import er.extensions.migration.ERXMigrator;
 import er.extensions.statistics.ERXStats;
@@ -139,6 +140,7 @@ import er.extensions.statistics.ERXStats;
  * @property er.extensions.ERXApplication.StatisticsLogRotationFrequency
  * @property er.extensions.ERXApplication.developmentMode
  * @property er.extensions.ERXApplication.developmentMode
+ * @property er.extensions.ERXApplication.enableERXShutdownHook
  * @property er.extensions.ERXApplication.fixCachingEnabled
  * @property er.extensions.ERXApplication.lowMemBufferSize
  * @property er.extensions.ERXApplication.memoryLowThreshold
@@ -855,6 +857,11 @@ public abstract class ERXApplication extends ERXAjaxApplication implements ERXGr
 		}
 	}
 	}
+	
+	// You should not use ERXShutdownHook when deploying as servlet.
+	protected static boolean enableERXShutdownHook() {
+		return ERXProperties.booleanForKeyWithDefault("er.extensions.ERXApplication.enableERXShutdownHook", true);
+	}
 
 	/**
 	 * Called when the application starts up and saves the command line
@@ -864,6 +871,11 @@ public abstract class ERXApplication extends ERXAjaxApplication implements ERXGr
 	 */
 	public static void main(String argv[], Class applicationClass) {
 		setup(argv);
+		
+		if(enableERXShutdownHook()) {
+			ERXShutdownHook.initERXShutdownHook();
+		}
+
 		WOApplication.main(argv, applicationClass);
 	}
 
@@ -1036,6 +1048,17 @@ public abstract class ERXApplication extends ERXAjaxApplication implements ERXGr
 	}
 
 	/**
+	 * This heuristic to determine if an application is deployed as servlet relays on the fact, 
+	 * that contextClassName() is set WOServletContext or ERXWOServletContext
+	 * 
+	 * @return true if the application is deployed as servlet.
+	 */
+	public boolean isDeployedAsServlet() {
+		return contextClassName().contains("Servlet"); // i.e one of WOServletContext or ERXWOServletContext
+	}
+
+
+	/**
 	 * Called prior to actually initializing the app. Defines framework load
 	 * order, class path order, checks patches etc.
 	 */
@@ -1048,9 +1071,12 @@ public abstract class ERXApplication extends ERXAjaxApplication implements ERXGr
 		ERXConfigurationManager.defaultManager().setCommandLineArguments(argv);
 		ERXFrameworkPrincipal.setUpFrameworkPrincipalClass(ERXExtensions.class);
 		// NSPropertiesCoordinator.loadProperties();
-		ERXShutdownHook.useMe();
+		
+		if(enableERXShutdownHook()) {
+			ERXShutdownHook.useMe();
+		}
 	}
-
+	
 	/**
 	 * Installs several bugfixes and enhancements to WODynamicElements. Sets the
 	 * Context class name to "er.extensions.ERXWOContext" if it is "WOContext".
@@ -1235,6 +1261,7 @@ public abstract class ERXApplication extends ERXAjaxApplication implements ERXGr
 	        	_replaceApplicationPathReplace = "";
 	        }
 	    }
+
 	}
 
 	/**
