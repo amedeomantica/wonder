@@ -898,7 +898,7 @@ public class ERXRouteController extends WODirectAction {
 		else {
 			ERXRestFetchSpecification.Results<?> fetchResults = fetchSpec.results(editingContext(), options());
 			results = response(format(), editingContext(), fetchSpec.entityName(), fetchResults.objects(), filter);
-			if (fetchResults.batchSize() > 0 && options().valueForKey("Range") != null && _canSetHeaderForActionResults(results)) {
+			if (fetchResults.batchSize() > 0 && options().valueForKey("range") != null && _canSetHeaderForActionResults(results)) {
 				String contentRangeValue = "items " + fetchResults.startIndex() + "-" + (fetchResults.startIndex() + fetchResults.batchSize() - 1) + "/" + fetchResults.totalCount();
 				_setHeaderForActionResults(contentRangeValue, "Content-Range", results);
 			}
