@@ -79,6 +79,7 @@ import er.extensions.statistics.ERXStats;
  * @d2wKey subTask
  * @d2wKey checkSortOrderingKeys
  * @d2wKey defaultSortOrdering
+ * @d2wkey userPreferencesCanSpecifySorting
  * @d2wKey displayPropertyKeys
  * @d2wKey restrictingFetchSpecification
  * @d2wKey isEntityInspectable
@@ -379,6 +380,10 @@ public class ERD2WListPage extends ERD2WPage implements ERDListPageInterface, Se
 	// this can be overridden by subclasses for which sorting has to be fixed
 	// (i.e. Grouping Lists)
 	public boolean userPreferencesCanSpecifySorting() {
+		boolean userPreferencesCanSpecifySorting = ERXValueUtilities.booleanValueWithDefault(d2wContext().valueForKey("userPreferencesCanSpecifySorting"), true);
+		if(!userPreferencesCanSpecifySorting) {
+			return false;
+		}
 		return !"printerFriendly".equals(d2wContext().valueForKey("subTask"));
 	}
 
