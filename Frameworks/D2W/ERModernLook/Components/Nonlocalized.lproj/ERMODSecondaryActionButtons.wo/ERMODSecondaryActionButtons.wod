@@ -13,6 +13,7 @@ PrinterButton: WOSwitchComponent {
 ActionBar: WOSwitchComponent {
 	WOComponentName = d2wContext.actionBarComponentName;
 	d2wContext = d2wContext;
+	dataSource = dataSource;
 }
 
 Controller: WOSwitchComponent {
