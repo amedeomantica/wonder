@@ -13,19 +13,19 @@ import java.util.Iterator;
 import java.util.Set;
 
 /**
- * <span class="en">
+ * <div class="en">
  * NSSet reimplementation to support JDK 1.5 templates. Use with
- * </span>
+ * </div>
  * 
- * <span class="ja">
+ * <div class="ja">
  * JDK 1.5 テンプレートをサポートする為の再実装。使用は
- * </span>
+ * </div>
  * 
- * <pre>
+ * <pre>{@code
  * NSSet<E> setA = new NSSet<E>(NSArray<E> listA);
- * NSSet<E> setB = new NSSet<E>(NSArray<E> listB);
- * logger.debug("intersection contains " + setA.setByIntersectingSet(setB));
- * </pre>
+ *NSSet<E> setB = new NSSet<E>(NSArray<E> listB);
+ *logger.debug("intersection contains " + setA.setByIntersectingSet(setB));
+ * }</pre>
  * 
  * @param <E> - type of set contents
  */
@@ -116,6 +116,9 @@ public class NSSet<E> implements Cloneable, Serializable, NSCoding, _NSFoundatio
 	}
 
 	private NSSet(E[] objects, boolean checkForNull) {
+		if (objects == null) {
+			throw new IllegalArgumentException("Objects cannot be null.");
+		}
 		initFromObjects(objects, checkForNull);
 	}
 

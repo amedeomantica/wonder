@@ -1,6 +1,7 @@
 package er.ajax;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.webobjects.appserver.WOActionResults;
 import com.webobjects.appserver.WOApplication;
@@ -71,10 +72,7 @@ public class AjaxFlexibleFileUpload extends AjaxFileUpload {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	/**
-	 * Logger
-	 */
-	private static final Logger log = Logger.getLogger(AjaxFlexibleFileUpload.class);
+	private static final Logger log = LoggerFactory.getLogger(AjaxFlexibleFileUpload.class);
 	
 	public static interface Keys {
 		public static final String name = "name";
@@ -102,7 +100,46 @@ public class AjaxFlexibleFileUpload extends AjaxFileUpload {
 		public static final String clearUploadProgressOnSuccess = "clearUploadProgressOnSuccess";
 		public static final String onClickBefore = "onClickBefore";
 	}
-	
+
+	/**
+	 * Wrapper class to expose only the methods we need to {@link AjaxProxy}.
+	 * 
+	 * @author paulh
+	 * @see <a href="https://github.com/wocommunity/wonder/issues/768">#768</a>
+	 */
+	public final class Proxy {
+		/**
+		 * Wrapper for {@link AjaxFlexibleFileUpload#uploadState()}.
+		 * 
+		 * @return see {@link AjaxFlexibleFileUpload#uploadState()}
+		 */
+		public NSDictionary<String, ?> uploadState() {
+			return AjaxFlexibleFileUpload.this.uploadState();
+		}
+
+		/**
+		 * Wrapper for {@link AjaxFlexibleFileUpload#cancelUpload()}.
+		 */
+		public void cancelUpload() {
+			AjaxFlexibleFileUpload.this.cancelUpload();
+			return;
+		}
+
+		/**
+		 * Wrapper for {@link AjaxFlexibleFileUpload#uploadState()}.
+		 * 
+		 * @return see {@link AjaxFlexibleFileUpload#uploadState()}
+		 */
+		public WOActionResults clearFileResults() {
+			return AjaxFlexibleFileUpload.this.clearFileResults();
+		}
+	}
+
+	/**
+	 * Proxy used for method access by {@link AjaxProxy}
+	 */
+	public final Proxy proxy = new Proxy();
+
 	private String _refreshTime;
 	private String _clearLabel;
 	private String _cancelLabel;
@@ -146,7 +183,7 @@ public class AjaxFlexibleFileUpload extends AjaxFileUpload {
      */
 	public String ajaxUploadScript() {
 		String result = "AUP.add('" + id() + "', " + ajaxProxyName() +", {" + ajaxUploadLabels() + "}, {" + options() + "}, {" + ajaxUploadOptions() + "});";
-		if (log.isDebugEnabled()) log.debug("AFU Create Script: " + result);
+		log.debug("AFU Create Script: {}", result);
 		return result;
 	}
 	
@@ -306,7 +343,7 @@ public class AjaxFlexibleFileUpload extends AjaxFileUpload {
 		if (state == UploadState.CANCELED) {
 			stateObj.takeValueForKey(cancelUrl(), "cancelUrl");
 		}
-		if (log.isDebugEnabled()) log.debug("AjaxFlexibleFileUpload2.uploadState: " + stateObj);
+		log.debug("AjaxFlexibleFileUpload2.uploadState: {}", stateObj);
 		return stateObj.immutableClone();
 	}
 	
@@ -345,7 +382,7 @@ public class AjaxFlexibleFileUpload extends AjaxFileUpload {
 				}
 			}
 		}
-		if (log.isDebugEnabled()) log.debug("AjaxFlexibleFileUpload.refreshState: " + state);
+		log.debug("AjaxFlexibleFileUpload.refreshState: {}", state);
 	}
 	
 	/**
@@ -522,7 +559,7 @@ public class AjaxFlexibleFileUpload extends AjaxFileUpload {
 	public String cancelUrl() {
 		NSDictionary<String, Object> queryParams = new NSDictionary<String, Object>(Boolean.FALSE, WOApplication.application().sessionIdKey());
 		String url = context()._directActionURL("ERXDirectAction/closeHTTPSession", queryParams, ERXRequest.isRequestSecure(context().request()), 0, false);
-		if (log.isDebugEnabled()) log.debug("URL: " + url);
+		log.debug("URL: {}", url);
 		return url;
 	}
 	
@@ -676,28 +713,13 @@ public class AjaxFlexibleFileUpload extends AjaxFileUpload {
 	}
 	
 	/**
-	 * Utility to return string value for binding or default value if no value is found
-	 * only really needed to support < WO5.4
-	 * @param key
-	 * @param defaultValue
-	 * @return value for binding or defaultValue
-	 */
-	private String stringValueForBinding(String key, String defaultValue) {
-		String result = (String) valueForBinding(key);
-		if (result == null) {
-			result = defaultValue;
-		}
-		return result;
-	}
-	
-	/**
 	 * Utility to return localized value from stringValueForBinding
 	 * @param key
 	 * @param defaultValue
 	 * @return localized value of binding key or defaultValue
 	 */
 	private String localizedStringForBinding(String key, String defaultValue) {
-		return localizedString(stringValueForBinding(key, defaultValue));
+		return localizedString(valueForStringBinding(key, defaultValue));
 	}
 	
 	/**
@@ -756,7 +778,7 @@ public class AjaxFlexibleFileUpload extends AjaxFileUpload {
 	 */
 	public String selectFileButtonClass() {
 		if (_selectFileButtonClass == null) {
-			_selectFileButtonClass = stringValueForBinding(Keys.selectFileButtonClass, "Button ObjButton SelectFileObjButton");
+			_selectFileButtonClass = valueForStringBinding(Keys.selectFileButtonClass, "Button ObjButton SelectFileObjButton");
 		}
 		return _selectFileButtonClass;
 	}
@@ -768,7 +790,7 @@ public class AjaxFlexibleFileUpload extends AjaxFileUpload {
 	 */
 	public String uploadButtonClass() {
 		if (_uploadButtonClass == null) {
-			_uploadButtonClass = stringValueForBinding(Keys.uploadButtonClass, "Button ObjButton UploadFileObjButton");
+			_uploadButtonClass = valueForStringBinding(Keys.uploadButtonClass, "Button ObjButton UploadFileObjButton");
 		}
 		return _uploadButtonClass;
 	}
@@ -780,7 +802,7 @@ public class AjaxFlexibleFileUpload extends AjaxFileUpload {
 	 */
 	public String cancelButtonClass() {
 		if (_cancelButtonClass == null) {
-			_cancelButtonClass = stringValueForBinding(Keys.cancelButtonClass, "Button ObjButton CancelUploadObjButton");
+			_cancelButtonClass = valueForStringBinding(Keys.cancelButtonClass, "Button ObjButton CancelUploadObjButton");
 		}
 		return _cancelButtonClass;
 	}
@@ -792,7 +814,7 @@ public class AjaxFlexibleFileUpload extends AjaxFileUpload {
 	 */
 	public String clearButtonClass() {
 		if (_clearButtonClass == null) {
-			_clearButtonClass = stringValueForBinding(Keys.clearButtonClass, "Button ObjButton ClearUploadObjButton");
+			_clearButtonClass = valueForStringBinding(Keys.clearButtonClass, "Button ObjButton ClearUploadObjButton");
 		}
 		return _clearButtonClass;
 	}

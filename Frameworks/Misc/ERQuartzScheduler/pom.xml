@@ -2,7 +2,7 @@
 	<parent>
 		<groupId>wonder.frameworks</groupId>
 		<artifactId>misc</artifactId>
-		<version>6.1.4-SNAPSHOT</version>
+		<version>7.0.0-SNAPSHOT</version>
 	</parent>
 
 	<modelVersion>4.0.0</modelVersion>
@@ -50,8 +50,8 @@
 		    <artifactId>quartz</artifactId>
 		</dependency>
 		<dependency>
-		    <groupId>javax.mail</groupId>
-		    <artifactId>mail</artifactId>
+		    <groupId>com.sun.mail</groupId>
+		    <artifactId>javax.mail</artifactId>
 		</dependency>
 		<dependency>
 		    <groupId>junit</groupId>

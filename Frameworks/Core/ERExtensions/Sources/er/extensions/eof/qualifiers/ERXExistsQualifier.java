@@ -10,7 +10,7 @@ import java.util.Enumeration;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,8 +41,10 @@ import com.webobjects.foundation.NSKeyValueCodingAdditions;
 import com.webobjects.foundation.NSMutableArray;
 import com.webobjects.foundation.NSMutableSet;
 
+import er.extensions.eof.ERXKey;
 import er.extensions.foundation.ERXArrayUtilities;
 import er.extensions.foundation.ERXStringUtilities;
+import er.extensions.qualifiers.ERXPrefixQualifierTraversal;
 
 /**
  * A qualifier that qualifies using an EXISTS clause.
@@ -51,7 +53,7 @@ import er.extensions.foundation.ERXStringUtilities;
  *
  * <code>select t0.ID, t0.ATT_1, ... t0.ATT_N from FIRST_TABLE t0 where EXISTS (select t1.ID from ANOTHER_TABLE where t1.ATT_1 = ? and t1.FIRST_TABLE_ID = t0.ID)</code>
  *
- * @author Travis Cripps, Aaron Rosenzweig
+ * @author Travis Cripps, Aaron Rosenzweig, Samuel Pelletier
  */
 public class ERXExistsQualifier extends EOQualifier implements Cloneable, NSCoding, EOKeyValueArchiving {
 	/**
@@ -229,6 +231,23 @@ public class ERXExistsQualifier extends EOQualifier implements Cloneable, NSCodi
                     }
                 }
             }
+            
+            // If this is a flattened relationship, we need to insert the middle hidden entity and adjust key paths
+            if (relationship != null && relationship.definition() != null) {
+            	if (relationship.componentRelationships().count() != 2) {
+            		throw new IllegalArgumentException("ERXExistsQualifier only support many to many flattened relationship.");
+            	}
+            	EORelationship innerToManyRelationship = (EORelationship) relationship.componentRelationships().objectAtIndex(0);
+            	EORelationship innerToOneRelationship = (EORelationship) relationship.componentRelationships().objectAtIndex(1);
+            	
+            	if (baseKeyPath != null) {
+            		baseKeyPath = baseKeyPath.replaceAll(relationship.name()+"$", innerToManyRelationship.relationshipPath());
+            	}
+            	relationship = innerToManyRelationship;
+            	
+            	ERXKey<Object> prefixKey = new ERXKey<>(innerToOneRelationship.relationshipPath());
+            	subqualifier = prefixKey.prefix(subqualifier);
+            }
 
             EOEntity srcEntity = relationship != null ? relationship.entity() : baseEntity;
             EOEntity destEntity = relationship != null ? relationship.destinationEntity() : baseEntity;
@@ -249,7 +268,7 @@ public class ERXExistsQualifier extends EOQualifier implements Cloneable, NSCodi
             }
 
             String srcEntityForeignKey = null;
-            NSArray<EOAttribute> sourceAttributes = relationship.sourceAttributes();
+            NSArray<EOAttribute> sourceAttributes = relationship != null ? relationship.sourceAttributes() : null;
             if (sourceAttributes != null && sourceAttributes.count() > 0) {
                 EOAttribute fk = sourceAttributes.lastObject();
                 srcEntityForeignKey = expression.sqlStringForAttribute(fk);
@@ -259,8 +278,14 @@ public class ERXExistsQualifier extends EOQualifier implements Cloneable, NSCodi
                 srcEntityForeignKey = expression.sqlStringForAttribute(pk);
             }
             
-            EOJoin parentChildJoin = ERXArrayUtilities.firstObject(relationship.joins());
-            String destEntityForeignKey = "." + expression.sqlStringForSchemaObjectName(parentChildJoin.destinationAttribute().columnName());
+            String destEntityForeignKey;
+            if (relationship != null) {
+                EOJoin parentChildJoin = ERXArrayUtilities.firstObject(relationship.joins());
+                destEntityForeignKey = "." + expression.sqlStringForSchemaObjectName(parentChildJoin.destinationAttribute().columnName());
+            } else {
+                EOAttribute pk = srcEntity.primaryKeyAttributes().lastObject();
+                destEntityForeignKey = "." + expression.sqlStringForSchemaObjectName(pk.columnName());
+            }
             
             EOQualifier qual = EOQualifierSQLGeneration.Support._schemaBasedQualifierWithRootEntity(subqualifier, destEntity);
             EOFetchSpecification fetchSpecification = new EOFetchSpecification(destEntity.name(), qual, null, false, true, null);
@@ -270,7 +295,7 @@ public class ERXExistsQualifier extends EOQualifier implements Cloneable, NSCodi
 
             EOSQLExpression subExpression = factory.expressionForEntity(destEntity);
             subExpression.setUseAliases(true);
-            subExpression.prepareSelectExpressionWithAttributes(destEntity.primaryKeyAttributes(), false, fetchSpecification);
+            subExpression.prepareSelectExpressionWithAttributes(relationship.destinationAttributes(), false, fetchSpecification);
 
             for (Enumeration bindEnumeration = subExpression.bindVariableDictionaries().objectEnumerator(); bindEnumeration.hasMoreElements();) {
                 expression.addBindVariableDictionary((NSDictionary)bindEnumeration.nextElement());
@@ -454,7 +479,7 @@ public class ERXExistsQualifier extends EOQualifier implements Cloneable, NSCodi
 		boolean match = false;
 		NSKeyValueCodingAdditions obj = (NSKeyValueCodingAdditions) object;
 		if (obj != null && subqualifier != null) {
-			NSKeyValueCodingAdditions finalObj = (NSKeyValueCodingAdditions) obj.valueForKeyPath(baseKeyPath);
+			NSKeyValueCodingAdditions finalObj = baseKeyPath != null ? (NSKeyValueCodingAdditions) obj.valueForKeyPath(baseKeyPath) : obj;
 			if (finalObj != null) {
 				if (finalObj instanceof NSArray) {
 					NSArray<NSKeyValueCoding> objArray = (NSArray<NSKeyValueCoding>) finalObj;

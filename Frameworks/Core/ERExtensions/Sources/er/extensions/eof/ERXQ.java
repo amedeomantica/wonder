@@ -3,6 +3,7 @@ package er.extensions.eof;
 import java.util.Enumeration;
 import java.util.NoSuchElementException;
 
+import com.webobjects.eoaccess.EOEntity;
 import com.webobjects.eocontrol.EOAndQualifier;
 import com.webobjects.eocontrol.EOKeyValueQualifier;
 import com.webobjects.eocontrol.EONotQualifier;
@@ -363,6 +364,42 @@ public class ERXQ {
 		return new ERXKeyComparisonQualifier(key.key(), ERXQ.EQ, value.key());
 	}
 	
+
+	/**
+	 * Return a OR qualifier of identity qualifiers using each value from the param array
+	 * 
+	 * @param valueArray
+	 *            the array of values
+	 * @return an EOQualifier 
+	 * 
+	 * @author Samuel Pelletier
+	 * @since May 16, 2016
+	 */
+	public static EOQualifier isIn(NSArray<? extends ERXGenericRecord> valueArray) {
+		NSMutableArray<EOQualifier> qualifiers = new NSMutableArray<>();
+		for (ERXGenericRecord value : valueArray) {
+			qualifiers.add(is(value));
+		}
+		return new ERXOrQualifier(qualifiers);
+	}
+
+	/**
+	 * Return an identity qualifier to use with ERXExistsQualifier for example
+	 * 
+	 * @param value
+	 *            the value
+	 * @return an EOQualifier 
+	 * 
+	 * @author Samuel Pelletier
+	 * @since May 16, 2016
+	 */
+	public static EOQualifier is(ERXGenericRecord value) {
+		EOEntity entity = value.entity();
+		NSDictionary<String, Object> primaryKeyDictionary = value.rawPrimaryKeyDictionary(false /* inTransaction */);
+		EOQualifier thatAreThis = entity.qualifierForPrimaryKey(primaryKeyDictionary);
+		return thatAreThis;
+	}
+
 	/**
 	 * Equivalent to new ERXKeyValueQualifier(key,
 	 * EOQualifier.QualifierOperatorEqual, value);
@@ -684,7 +721,7 @@ public class ERXQ {
 	}
 
 	/**
-	 * Equivalent to key > lowerBound and key < upperBound (exclusive). Not that
+	 * Equivalent to key &gt; lowerBound and key &lt; upperBound (exclusive). Not that
 	 * this does not return an ERXBetweenQualifier.
 	 *
 	 * @param key
@@ -700,7 +737,7 @@ public class ERXQ {
 	}
 
 	/**
-	 * Equivalent to key >= lowerBound and key <= upperBound (inclusive). Not
+	 * Equivalent to key &gt;= lowerBound and key &lt;= upperBound (inclusive). Not
 	 * that this does not return an ERXBetweenQualifier.
 	 *
 	 * @param key

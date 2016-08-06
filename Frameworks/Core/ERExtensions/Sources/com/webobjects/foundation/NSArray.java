@@ -19,20 +19,20 @@ import er.extensions.eof.ERXKey;
 import er.extensions.foundation.ERXArrayUtilities;
 
 /**
- * <span class="en">
+ * <div class="en">
  * NSArray re-implementation to support JDK 1.5 templates. Use with
- * </span>
+ * </div>
  * 
- * <span class="ja">
+ * <div class="ja">
  * JDK 1.5 テンプレートをサポートする為の再実装。使用は
- * </span>
+ * </div>
  * 
- * <pre>
- * NSArray<Bug> bugs = ds.fetchObjects();
+ * <pre><code>
+ * NSArray&lt;Bug&gt; bugs = ds.fetchObjects();
  * 
  * for(Bug : bugs) {
  * 	  ...
- * }</pre>
+ * }</code></pre>
  *
  * @param <E> - type of array contents
  */
@@ -325,18 +325,14 @@ public class NSArray<E> implements Cloneable, Serializable, NSCoding, NSKeyValue
 
 	public NSArray(List<? extends E> list, boolean checkForNull) {
 		if (list == null) {
-			throw new NullPointerException("List cannot be null");
+			initFromObjects(null, 0, 0, false, false);
+		} else {
+			initFromList(list, 0, list.size(), 0, checkForNull, false);
 		}
-		initFromList(list, 0, list.size(), 0, checkForNull, false);
 	}
 
 	public NSArray(Collection<? extends E> collection, boolean checkForNull) {
-		if (collection == null) {
-			throw new NullPointerException("Collection cannot be null");
-		}
-		
-		Object[] anArray = collection.toArray();
-		initFromObjects(anArray, 0, anArray.length, checkForNull, false);
+		initFromObjects(collection == null ? null : collection.toArray(), 0, collection == null ? 0 : collection.size(), checkForNull, false);
 	}
 
 	public NSArray(Collection<? extends E> collection) {
@@ -1096,7 +1092,6 @@ public class NSArray<E> implements Cloneable, Serializable, NSCoding, NSKeyValue
 	}
 
 	/**
-	 * <p>
 	 * A type-safe wrapper for {@link #valueForKey(String)} that automatically
 	 * does the following (in order) to the resulting array prior to returning
 	 * it:
@@ -1107,10 +1102,9 @@ public class NSArray<E> implements Cloneable, Serializable, NSCoding, NSKeyValue
 	 * are arrays (<em>Only</em> if {@link ERXKey#isToManyRelationship()}
 	 * returns <code>true</code>, which can only possibly happen if
 	 * {@link ERXKey#type()} has been set.)</li>
-	 * <li>{@link ERXArrayUtilities#distinct(NSArray) remove} all duplicate
+	 * <li>{@link ERXArrayUtilities#distinct(Collection) remove} all duplicate
 	 * objects</li>
 	 * </ol>
-	 * </p>
 	 * 
 	 * @param <T>
 	 *            the Type of elements in the returned {@code NSArray}
@@ -1125,11 +1119,9 @@ public class NSArray<E> implements Cloneable, Serializable, NSCoding, NSKeyValue
 	}
 
 	/**
-	 * <p>
 	 * A type-safe wrapper for {@link #valueForKeyPath(String)} that calls
 	 * {@code valueForKeyPath(erxKey.key())} and attempts to cast the result to
 	 * {@code NSArray<T>}.
-	 * </p>
 	 * <p>
 	 * Then, depending upon the parameters,
 	 * <ol>
@@ -1139,14 +1131,12 @@ public class NSArray<E> implements Cloneable, Serializable, NSCoding, NSKeyValue
 	 * are arrays (<em>Only</em> if {@link ERXKey#isToManyRelationship()}
 	 * returns <code>true</code>, which can only possibly happen if
 	 * {@link ERXKey#type()} has been set.)</li>
-	 * <li>{@link ERXArrayUtilities#distinct(NSArray) remove} all duplicate
+	 * <li>{@link ERXArrayUtilities#distinct(Collection) remove} all duplicate
 	 * objects</li>
 	 * </ol>
-	 * </p>
 	 * <p>
 	 * <b>If the value cannot be cast it will throw a {@link ClassCastException}
 	 * .</b>
-	 * </p>
 	 * 
 	 * @param <T>
 	 *            the Type of elements in the returned {@code NSArray}
