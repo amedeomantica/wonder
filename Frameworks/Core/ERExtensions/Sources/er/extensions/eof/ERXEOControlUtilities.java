@@ -2652,7 +2652,7 @@ public class ERXEOControlUtilities {
 	}
 	
 	/**
-	 * Similar to EOUtiities.objectMatchingKeyAndValue, but it searches also in inserted/updated objects
+	 * Similar to EOUtiities.objectMatchingKeyAndValue, but it searches also in inserted/updated objects in the editing context
 	 * @param ec
 	 * @param entityName
 	 * @param key
