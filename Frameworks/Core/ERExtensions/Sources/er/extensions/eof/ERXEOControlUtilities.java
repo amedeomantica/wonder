@@ -2650,4 +2650,38 @@ public class ERXEOControlUtilities {
 		}
 
 	}
+	
+	/**
+	 * Similar to EOUtiities.objectMatchingKeyAndValue, but it searches also in inserted/updated objects
+	 * @param ec
+	 * @param entityName
+	 * @param key
+	 * @param value
+	 * @return the found EO or throws
+	 */
+	public static EOEnterpriseObject objectMatchingKeyAndValue(EOEditingContext ec, String entityName, String key, String value) {
+		ec.processRecentChanges();
+		
+		EOQualifier q = ERXQ.is(key, value);
+		NSArray<String> e = new NSArray<>(entityName);
+		
+		NSMutableArray<EOEnterpriseObject> inserted = insertedObjects(ec, e, q);
+		if(inserted.size() == 1) {
+			return inserted.objectAtIndex(0);
+		}
+		if(inserted.size() > 1) {
+			throw new MoreThanOneException("More than one object found for: " + entityName + " key: " + key + " value:" + value);
+		}
+		
+		
+		NSMutableArray<EOEnterpriseObject> updated = updatedObjects(ec, e, q);
+		if(updated.size() == 1) {
+			return updated.objectAtIndex(0);
+		}
+		if(updated.size() > 1) {
+			throw new MoreThanOneException("More than one object found for: " + entityName + " key: " + key + " value:" + value);
+		}
+		
+		return EOUtilities.objectMatchingKeyAndValue(ec, entityName, key, value);
+	}
 }
